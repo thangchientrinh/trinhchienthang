@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2026 — Days in a Year</title>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #eeede8;
+  --text1: #1a1918;
+  --text2: #6b6960;
+  --text3: #b0ada4;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --past: #1a1918;
+  --today: #2a5fa8;
+  --today-light: #dde8f7;
+  --future: #d8d6cf;
+  --accent: #2a5fa8;
+  --tab-active-bg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161513;
+    --surface: #1f1e1b;
+    --surface2: #2a2926;
+    --text1: #eeecea;
+    --text2: #928f87;
+    --text3: #4a4844;
+    --border: rgba(255,255,255,0.06);
+    --border2: rgba(255,255,255,0.11);
+    --past: #d8d6cf;
+    --today: #7db3e8;
+    --today-light: #0c2d52;
+    --future: #2a2926;
+    --accent: #7db3e8;
+    --tab-active-bg: #1f1e1b;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text1);
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.header h1 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 56px;
+  font-weight: 300;
+  letter-spacing: -2px;
+  line-height: 1;
+  color: var(--text1);
+}
+
+.header .today-dt {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-style: normal;
+  font-size: 56px;
+  font-weight: 300;
+  letter-spacing: -2px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  margin-bottom: 28px;
+}
+
+/* PROGRESS BAR */
+.bar-wrap { margin-bottom: 28px; }
+.bar-bg {
+  height: 3px;
+  background: var(--future);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.bar-fill {
+  height: 100%;
+  background: var(--past);
+  border-radius: 99px;
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+.bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.03em;
+}
+.bar-labels strong { color: var(--text1); font-weight: 400; }
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.stat {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 10px;
+  text-align: center;
+}
+.stat-val {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text1);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+.stat-lbl {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 5px;
+  letter-spacing: 0.04em;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 20px;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 9px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  border: none;
+  background: transparent;
+  user-select: none;
+}
+.tab:hover { color: var(--text2); }
+.tab.active {
+  background: var(--tab-active-bg);
+  color: var(--text1);
+  border: 0.5px solid var(--border2);
+}
+
+/* TOOLTIP BAR */
+.tip {
+  font-size: 12px;
+  color: var(--text2);
+  min-height: 20px;
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+  transition: color 0.15s;
+}
+.tip.pinned { color: var(--accent); }
+
+/* PANELS */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ===== VIEW B: CALENDAR ===== */
+.months-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 10px;
+}
+.month-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 10px;
+}
+.mname {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.dow-row {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 2px;
+  margin-bottom: 3px;
+}
+.dow {
+  font-size: 8px;
+  color: var(--text3);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 2px;
+}
+.day {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: transparent;
+}
+.day:hover { transform: scale(1.35); z-index: 1; }
+.day.past { background: var(--past); }
+.day.today { background: var(--accent); color: #fff; font-weight: 400; }
+.day.future { background: var(--future); }
+.day.empty { background: transparent; cursor: default; pointer-events: none; }
+.day.pinned { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ===== VIEW C: TIMELINE ===== */
+.tl-grid { display: flex; flex-direction: column; gap: 5px; }
+.tl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tl-lbl {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  color: var(--text3);
+  width: 26px;
+  flex-shrink: 0;
+}
+.tl-track {
+  flex: 1;
+  display: flex;
+  gap: 1px;
+  align-items: center;
+}
+.seg {
+  flex: 1;
+  height: 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: height 0.12s;
+}
+.seg:hover { height: 26px; }
+.seg.past { background: var(--past); }
+.seg.today { background: var(--accent); height: 24px; }
+.seg.future { background: var(--future); }
+.seg.pinned { outline: 2px solid var(--accent); outline-offset: 1px; height: 26px; }
+.tl-pct {
+  font-size: 10px;
+  color: var(--text3);
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ===== VIEW D: RINGS ===== */
+.rings-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 16px 0 8px;
+}
+.ring-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.ring-qlabel {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text2);
+}
+.ring-months {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.ring-done { color: var(--past); }
+.ring-active { color: var(--accent); }
+.ring-future { color: var(--text3); }
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 0.5px solid var(--border);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.03em;
+}
+.li { display: flex; align-items: center; gap: 6px; }
+.ld { width: 10px; height: 10px; border-radius: 2px; }
+
+@media (max-width: 480px) {
+  .header h1, .header .today-dt { font-size: 38px; }
+  .months-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .rings-wrap { gap: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>2026</h1>
+    <span class="today-dt" id="today-dt"></span>
+  </div>
+  <p class="sub">every dot is a day — each one only comes once</p>
+
+  <div class="bar-wrap">
+    <div class="bar-bg"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+    <div class="bar-labels">
+      <span id="ll"></span>
+      <strong id="lp"></strong>
+      <span id="lr"></span>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="cal">calendar</button>
+    <button class="tab" data-tab="tl">timeline</button>
+    <button class="tab" data-tab="rings">quarters</button>
+  </div>
+
+  <div class="tip" id="tip">hover or click any day</div>
+
+  <!-- PANEL B: CALENDAR -->
+  <div class="panel active" id="panel-cal">
+    <div class="months-grid" id="mgrid"></div>
+  </div>
+
+  <!-- PANEL C: TIMELINE -->
+  <div class="panel" id="panel-tl">
+    <div class="tl-grid" id="tlgrid"></div>
+  </div>
+
+  <!-- PANEL D: RINGS -->
+  <div class="panel" id="panel-rings">
+    <div class="rings-wrap" id="rings"></div>
+  </div>
+
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:var(--past)"></div>past</div>
+    <div class="li"><div class="ld" style="background:var(--accent)"></div><span id="legend-today">today</span></div>
+    <div class="li"><div class="ld" style="background:var(--future)"></div>future</div>
+  </div>
+
+</div>
+
+<script>
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MDAYS  = [31,28,31,30,31,30,31,31,30,31,30,31];
+var DOWSHORT = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+var DOWFULL  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var TOTAL = 365;
+
+var now   = new Date();
+var start = new Date(2026, 0, 1);
+var todayIdx = Math.floor((now - start) / 86400000);
+todayIdx = Math.max(0, Math.min(todayIdx, TOTAL - 1));
+
+var pct  = Math.round(((todayIdx + 1) / TOTAL) * 100);
+var past = todayIdx;
+var left = TOTAL - todayIdx - 1;
+
+var todayDate = new Date(2026, 0, todayIdx + 1);
+var todayStr  = todayDate.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+
+document.getElementById('today-dt').textContent = todayStr;
+document.getElementById('legend-today').textContent = 'today (' + todayStr + ')';
+setTimeout(function(){ document.getElementById('bar').style.width = pct + '%'; }, 80);
+document.getElementById('ll').textContent = past + ' passed';
+document.getElementById('lp').textContent = pct + '%';
+document.getElementById('lr').textContent = left + ' left';
+
+var qNum  = Math.min(Math.floor(todayIdx / 91) + 1, 4);
+var qPct  = Math.round(((todayIdx % 91) + 1) / 91 * 100);
+var sd = [['day of year', todayIdx + 1], ['Q' + qNum + ' progress', qPct + '%'], ['weeks left', Math.ceil(left / 7)], ['days to 2027', left]];
+var sh = '';
+for (var s = 0; s < sd.length; s++) {
+  sh += '<div class="stat"><div class="stat-val">' + sd[s][1] + '</div><div class="stat-lbl">' + sd[s][0] + '</div></div>';
+}
+document.getElementById('stats').innerHTML = sh;
+
+var tip = document.getElementById('tip');
+var pinnedEl  = null;
+var pinnedIdx = -1;
+
+function getLabel(i) {
+  var date  = new Date(2026, 0, i + 1);
+  var dname = DOWFULL[date.getDay()];
+  var mname = date.toLocaleDateString('en-US', {month: 'long', day: 'numeric'});
+  if (i < todayIdx) {
+    var d = todayIdx - i;
+    return mname + ' (' + dname + ') — ' + d + ' day' + (d > 1 ? 's' : '') + ' ago';
+  }
+  if (i === todayIdx) return mname + ' (' + dname + ') — today';
+  var d = i - todayIdx;
+  return mname + ' (' + dname + ') — in ' + d + ' day' + (d > 1 ? 's' : '');
+}
+
+function attachDot(el, i, defaultTip) {
+  el.addEventListener('mouseenter', function() {
+    if (pinnedIdx === -1) { tip.textContent = getLabel(i); tip.className = 'tip'; }
+  });
+  el.addEventListener('mouseleave', function() {
+    if (pinnedIdx === -1) { tip.textContent = defaultTip; tip.className = 'tip'; }
+  });
+  el.addEventListener('click', function() {
+    if (pinnedIdx === i) {
+      pinnedEl.classList.remove('pinned');
+      pinnedEl = null; pinnedIdx = -1;
+      tip.textContent = defaultTip; tip.className = 'tip';
+    } else {
+      if (pinnedEl) pinnedEl.classList.remove('pinned');
+      pinnedEl = el; pinnedIdx = i;
+      el.classList.add('pinned');
+      tip.textContent = '[pinned] ' + getLabel(i); tip.className = 'tip pinned';
+    }
+  });
+}
+
+/* ===== BUILD CALENDAR ===== */
+var mgrid  = document.getElementById('mgrid');
+var dayIdx = 0;
+for (var m = 0; m < 12; m++) {
+  var card = document.createElement('div'); card.className = 'month-card';
+  var mn = document.createElement('div'); mn.className = 'mname'; mn.textContent = MONTHS[m];
+  card.appendChild(mn);
+  var dr = document.createElement('div'); dr.className = 'dow-row';
+  for (var w = 0; w < 7; w++) { var dw = document.createElement('div'); dw.className = 'dow'; dw.textContent = DOWSHORT[w]; dr.appendChild(dw); }
+  card.appendChild(dr);
+  var cg = document.createElement('div'); cg.className = 'cal-grid';
+  var firstDow = new Date(2026, m, 1).getDay();
+  for (var e = 0; e < firstDow; e++) { var em = document.createElement('div'); em.className = 'day empty'; cg.appendChild(em); }
+  for (var d = 1; d <= MDAYS[m]; d++) {
+    (function(i, m2, d2) {
+      var el = document.createElement('div');
+      el.className = 'day ' + (i < todayIdx ? 'past' : i === todayIdx ? 'today' : 'future');
+      if (i === todayIdx) el.textContent = d2;
+      attachDot(el, i, 'hover or click any day');
+      cg.appendChild(el);
+    })(dayIdx, m, d);
+    dayIdx++;
+  }
+  card.appendChild(cg);
+  mgrid.appendChild(card);
+}
+
+/* ===== BUILD TIMELINE ===== */
+var tlgrid = document.getElementById('tlgrid');
+dayIdx = 0;
+for (var m = 0; m < 12; m++) {
+  var row = document.createElement('div'); row.className = 'tl-row';
+  var lbl = document.createElement('div'); lbl.className = 'tl-lbl'; lbl.textContent = MONTHS[m];
+  var track = document.createElement('div'); track.className = 'tl-track';
+  var passed = 0;
+  for (var d = 0; d < MDAYS[m]; d++) {
+    (function(i) {
+      var seg = document.createElement('div');
+      seg.className = 'seg ' + (i < todayIdx ? 'past' : i === todayIdx ? 'today' : 'future');
+      attachDot(seg, i, 'hover or click any segment');
+      track.appendChild(seg);
+      if (i <= todayIdx) passed++;
+    })(dayIdx);
+    dayIdx++;
+  }
+  var pctEl = document.createElement('div'); pctEl.className = 'tl-pct';
+  var mp = Math.round(passed / MDAYS[m] * 100);
+  pctEl.textContent = (mp > 0 && mp < 100) ? mp + '%' : '';
+  row.appendChild(lbl); row.appendChild(track); row.appendChild(pctEl);
+  tlgrid.appendChild(row);
+}
+
+/* ===== BUILD RINGS ===== */
+var QUARTERS = [
+  {label:'Q1', start:0,   end:89,  months:'Jan – Mar'},
+  {label:'Q2', start:90,  end:180, months:'Apr – Jun'},
+  {label:'Q3', start:181, end:272, months:'Jul – Sep'},
+  {label:'Q4', start:273, end:364, months:'Oct – Dec'}
+];
+
+var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+var cPast    = isDark ? '#d8d6cf' : '#1a1918';
+var cToday   = isDark ? '#7db3e8' : '#2a5fa8';
+var cFuture  = isDark ? '#2a2926' : '#d8d6cf';
+var cMuted   = isDark ? '#4a4844' : '#b0ada4';
+var cText    = isDark ? '#928f87' : '#6b6960';
+
+var ringsEl = document.getElementById('rings');
+QUARTERS.forEach(function(q) {
+  var total  = q.end - q.start + 1;
+  var done   = Math.max(0, Math.min(todayIdx - q.start + 1, total));
+  var isActive = todayIdx >= q.start && todayIdx <= q.end;
+  var isDone   = todayIdx > q.end;
+  var qp = Math.round(done / total * 100);
+
+  var size = 140, cx = 70, cy = 70, r = 52, sw = 11;
+  var circ = 2 * Math.PI * r;
+  var fill = circ * (done / total);
+
+  var item = document.createElement('div'); item.className = 'ring-item';
+
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', size); svg.setAttribute('height', size);
+  svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
+
+  var bg = document.createElementNS(ns, 'circle');
+  bg.setAttribute('cx', cx); bg.setAttribute('cy', cy); bg.setAttribute('r', r);
+  bg.setAttribute('fill', 'none'); bg.setAttribute('stroke', cFuture); bg.setAttribute('stroke-width', sw);
+  svg.appendChild(bg);
+
+  var arc = document.createElementNS(ns, 'circle');
+  arc.setAttribute('cx', cx); arc.setAttribute('cy', cy); arc.setAttribute('r', r);
+  arc.setAttribute('fill', 'none');
+  arc.setAttribute('stroke', isActive ? cToday : isDone ? cPast : cFuture);
+  arc.setAttribute('stroke-width', sw);
+  arc.setAttribute('stroke-dasharray', fill + ' ' + circ);
+  arc.setAttribute('stroke-linecap', 'round');
+  arc.setAttribute('transform', 'rotate(-90 ' + cx + ' ' + cy + ')');
+  svg.appendChild(arc);
+
+  var pctT = document.createElementNS(ns, 'text');
+  pctT.setAttribute('x', cx); pctT.setAttribute('y', cy - 6);
+  pctT.setAttribute('text-anchor', 'middle');
+  pctT.setAttribute('font-size', '22');
+  pctT.setAttribute('font-weight', '300');
+  pctT.setAttribute('font-family', "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif");
+  pctT.setAttribute('fill', isActive ? cToday : isDone ? cPast : cMuted);
+  pctT.textContent = qp + '%';
+  svg.appendChild(pctT);
+
+  var subT = document.createElementNS(ns, 'text');
+  subT.setAttribute('x', cx); subT.setAttribute('y', cy + 14);
+  subT.setAttribute('text-anchor', 'middle');
+  subT.setAttribute('font-size', '9');
+  subT.setAttribute('letter-spacing', '1');
+  subT.setAttribute('font-family', "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif");
+  subT.setAttribute('fill', cMuted);
+  subT.textContent = Math.round(done) + '/' + total + ' days';
+  svg.appendChild(subT);
+
+  if (isActive && done > 0) {
+    var angle = (-Math.PI / 2) + (2 * Math.PI * (done / total));
+    var dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', cx + r * Math.cos(angle));
+    dot.setAttribute('cy', cy + r * Math.sin(angle));
+    dot.setAttribute('r', 5);
+    dot.setAttribute('fill', cToday);
+    svg.appendChild(dot);
+  }
+
+  var ql = document.createElement('div'); ql.className = 'ring-qlabel'; ql.textContent = q.label;
+  var qs = document.createElement('div'); qs.className = 'ring-months'; qs.textContent = q.months;
+
+  item.appendChild(svg); item.appendChild(ql); item.appendChild(qs);
+  ringsEl.appendChild(item);
+});
+
+/* ===== TABS ===== */
+var tabs   = document.querySelectorAll('.tab');
+var panels = document.querySelectorAll('.panel');
+tabs.forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    panels.forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    if (pinnedEl) { pinnedEl.classList.remove('pinned'); pinnedEl = null; pinnedIdx = -1; }
+    tip.textContent = 'hover or click any day'; tip.className = 'tip';
+  });
+});
+</script>
+</body>
+</html>
