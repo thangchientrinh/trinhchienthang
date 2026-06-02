@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080809;--s1:#0f0f11;--s2:#161618;--s3:#1d1d20;--s4:#252528;
+  --b1:rgba(255,255,255,0.05);--b2:rgba(255,255,255,0.09);--b3:rgba(255,255,255,0.16);--b4:rgba(255,255,255,0.26);
+  --text:#f0f0ec;--t2:#9898a0;--t3:#55555c;
+  --c-founder:#b8a8f8;--cb-founder:rgba(90,70,200,0.15);--cbr-founder:rgba(90,70,200,0.28);
+  --c-exec:#f5c06a;--cb-exec:rgba(200,130,30,0.15);--cbr-exec:rgba(200,130,30,0.28);
+  --c-recov:#68d4a8;--cb-recov:rgba(50,170,120,0.15);--cbr-recov:rgba(50,170,120,0.28);
+  --c-review:#f09070;--cb-review:rgba(200,90,50,0.15);--cbr-review:rgba(200,90,50,0.28);
+  --c-life:#90c080;--cb-life:rgba(80,160,70,0.15);--cbr-life:rgba(80,160,70,0.28);
+  --c-gym:#60c0e0;--cb-gym:rgba(40,140,190,0.15);--cbr-gym:rgba(40,140,190,0.28);
+  --red:#f07070;--grn:#68d498;--gnb:rgba(50,180,100,0.12);--gnbr:rgba(50,180,100,0.25);
+  --radius:8px;--radius-s:5px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --row-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1;min-height:100vh;padding:32px 28px 100px}
+button{font-family:var(--font);cursor:pointer;border:none;background:none}
+.page{max-width:1320px;margin:0 auto}
+
+/* HEADER */
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.hdr-eyebrow{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px}
+.hdr-title{font-size:21px;font-weight:300;letter-spacing:-.02em}
+.hdr-title em{font-style:normal;color:var(--t2)}
+.hdr-week{font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:4px;letter-spacing:.04em}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3);font-family:var(--mono)}
+.leg-pip{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+/* ENERGY */
+.energy-strip{display:flex;align-items:center;background:var(--s1);border:1px solid var(--b1);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;gap:18px;flex-wrap:wrap}
+.energy-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;flex-shrink:0;min-width:76px}
+.energy-days{display:flex;gap:10px;flex:1;flex-wrap:wrap}
+.eday{display:flex;flex-direction:column;align-items:center;gap:5px}
+.eday-name{font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.08em}
+.epips{display:flex;gap:3px}
+.epip{width:8px;height:8px;border-radius:50%;border:1px solid var(--b2);background:var(--s3);cursor:pointer;transition:transform .1s}
+.epip:hover{transform:scale(1.3)}
+.epip.e1{background:#d44;border-color:#a22}.epip.e2{background:#d84;border-color:#a60}
+.epip.e3{background:#bb4;border-color:#888}.epip.e4{background:#4a4;border-color:#282}.epip.e5{background:#2ba;border-color:#088}
+.energy-hint{display:flex;gap:8px;flex-shrink:0}
+.ehint-item{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px}
+.ehint-pip{width:7px;height:7px;border-radius:50%}
+
+/* BODY */
+.body-layout{display:flex;gap:14px;align-items:flex-start}
+.cal-outer{flex:1;min-width:0;overflow-x:auto}
+
+/* CALENDAR — uses a relative container per column, not CSS grid for blocks */
+.cal-wrap{display:grid;grid-template-columns:48px repeat(7,1fr);min-width:700px}
+.cal-corner{background:var(--bg);border-right:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.cal-ch{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--t3);text-align:center;padding:8px 4px;border-right:1px solid var(--b1);border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:0;z-index:10}
+.cal-ch.now{color:var(--c-founder)}
+.cal-time-col{border-right:1px solid var(--b1);background:var(--bg);position:sticky;left:0;z-index:5}
+.cal-time-cell{font-family:var(--mono);font-size:9px;color:var(--t3);text-align:right;padding-right:8px;padding-top:6px;height:var(--row-h);border-bottom:1px solid var(--b1);opacity:.6;letter-spacing:.02em}
+
+/* Day column — single relative container that holds half-hour cells + blocks */
+.cal-day-col{position:relative;border-right:1px solid var(--b1)}
+.cal-half-cell{height:26px;background:var(--s1);transition:background .1s;position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,0.025)}
+.cal-half-cell.top-of-hour{border-bottom:1px solid var(--b1)}
+.cal-half-cell:nth-child(even){border-bottom:1px solid var(--b1)}
+.cal-half-cell:hover{background:var(--s2)}
+.cal-half-cell.drop-active{background:var(--s3)!important;outline:1px solid var(--b3)}
+
+/* NOW LINE */
+.now-line{position:absolute;left:0;right:0;height:0;border-top:1.5px solid #f0707099;z-index:6;pointer-events:none}
+.now-line .now-dot{position:absolute;left:-3px;top:-4px;width:7px;height:7px;border-radius:50%;background:#f07070;box-shadow:0 0 6px #f0707088}
+
+/* PLACED BLOCK — absolutely positioned inside .cal-day-col */
+.pblk{
+  position:absolute;left:2px;right:2px;
+  border-radius:var(--radius-s);border:1px solid transparent;
+  cursor:grab;user-select:none;
+  display:flex;flex-direction:column;overflow:hidden;
+  z-index:3;transition:opacity .12s,box-shadow .12s;
+}
+.pblk:active{cursor:grabbing}
+.pblk.is-dragging{opacity:.2;pointer-events:none}
+.pblk-top{padding:6px 8px 2px;display:flex;align-items:flex-start;gap:6px;flex-shrink:0}
+.pblk-pip{width:5px;height:5px;border-radius:1px;margin-top:2px;flex-shrink:0}
+.pblk-name{font-size:11px;font-weight:500;line-height:1.3;letter-spacing:-.01em;flex:1}
+.pblk-x{font-size:10px;color:rgba(255,255,255,0.12);cursor:pointer;display:none;transition:color .1s;line-height:1;font-family:var(--mono);flex-shrink:0}
+.pblk:hover .pblk-x{display:block}
+.pblk-x:hover{color:rgba(255,255,255,0.55)}
+.pblk-time{font-family:var(--mono);font-size:8px;opacity:.5;padding:0 8px 3px;letter-spacing:.02em;flex-shrink:0}
+.pblk.tiny .pblk-top{padding:3px 8px 0}
+.pblk.tiny .pblk-time{display:none}
+.pblk.tiny{flex-direction:row;align-items:center}
+.pblk.tiny .pblk-name{font-size:10px}
+.pblk-note-zone{border-top:1px solid rgba(255,255,255,0.05);padding:4px 8px 5px;flex:1;min-height:0;overflow:hidden;margin-top:2px}
+.pblk-note-ph{font-size:9px;color:rgba(255,255,255,0.1);font-style:italic;font-family:var(--mono)}
+.pblk-note-txt{font-size:9px;color:rgba(255,255,255,0.38);font-style:italic;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;word-break:break-word}
+.pblk.short .pblk-note-zone{display:none}
+.pblk-resize{position:absolute;bottom:0;left:0;right:0;height:10px;cursor:ns-resize;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:none}
+.pblk-resize::after{content:'';width:24px;height:2px;border-radius:1px;background:rgba(255,255,255,0.1)}
+.pblk:hover .pblk-resize::after{background:rgba(255,255,255,0.28)}
+
+/* SUMMARY BAR */
+.summary-bar{display:flex;gap:18px;flex-wrap:wrap;align-items:center;background:var(--s1);border:1px solid var(--b1);border-radius:var(--radius);padding:11px 18px;margin-bottom:14px}
+.summary-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;flex-shrink:0;min-width:76px}
+.summary-items{display:flex;gap:16px;flex-wrap:wrap;flex:1}
+.sum-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)}
+.sum-pip{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.sum-val{font-family:var(--mono);color:var(--text);font-size:11px}
+
+/* conflict flash */
+@keyframes flash-red{0%{box-shadow:0 0 0 2px #f07070}100%{box-shadow:none}}
+.pblk.conflict{animation:flash-red .4s ease-out}
+
+/* themes */
+.b-founder{background:var(--cb-founder);border-color:var(--cbr-founder);color:var(--c-founder)}
+.b-exec{background:var(--cb-exec);border-color:var(--cbr-exec);color:var(--c-exec)}
+.b-recov{background:var(--cb-recov);border-color:var(--cbr-recov);color:var(--c-recov)}
+.b-review{background:var(--cb-review);border-color:var(--cbr-review);color:var(--c-review)}
+.b-life{background:var(--cb-life);border-color:var(--cbr-life);color:var(--c-life)}
+.b-gym{background:var(--cb-gym);border-color:var(--cbr-gym);color:var(--c-gym)}
+
+/* PALETTE */
+.palette{width:192px;flex-shrink:0}
+.pal-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:10px}
+.pal-blocks{display:flex;flex-direction:column;gap:5px}
+.pal-blk{border-radius:var(--radius-s);border:1px solid transparent;cursor:grab;user-select:none;overflow:hidden;transition:opacity .12s}
+.pal-blk:active{cursor:grabbing}
+.pal-blk.dragging{opacity:.2}
+.pal-top{display:flex;align-items:center;gap:8px;padding:8px 10px}
+.pal-pip{width:5px;height:5px;border-radius:1px;flex-shrink:0}
+.pal-name{font-size:11px;font-weight:500;letter-spacing:-.01em;flex:1}
+.pal-arrow{font-size:9px;opacity:.3;transition:transform .2s,opacity .2s;font-family:var(--mono);flex-shrink:0}
+.pal-blk.open .pal-arrow{transform:rotate(90deg);opacity:.6}
+.pal-detail{max-height:0;overflow:hidden;transition:max-height .25s cubic-bezier(.4,0,.2,1),opacity .2s;opacity:0;border-top:0px solid rgba(255,255,255,0.06)}
+.pal-blk.open .pal-detail{max-height:320px;opacity:1;border-top-width:1px}
+.pal-detail-inner{padding:9px 11px 11px;display:flex;flex-direction:column;gap:9px}
+.pal-sl{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,0.22);text-transform:uppercase;margin-bottom:3px}
+.pal-act{font-size:10px;line-height:1.7;color:rgba(255,255,255,0.5);display:flex;gap:5px}
+.pal-act::before{content:'·';opacity:.4;flex-shrink:0}
+.pal-rul{font-size:10px;line-height:1.7;color:rgba(255,255,255,0.3);display:flex;gap:5px}
+.pal-rul::before{content:'×';font-family:var(--mono);opacity:.3;flex-shrink:0;font-size:9px}
+.pal-dh{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.16);margin-top:4px}
+.pal-hints{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+.pal-hint-row{font-family:var(--mono);font-size:9px;color:var(--t3);display:flex;align-items:center;gap:6px;opacity:.6}
+.pal-hk{background:var(--s3);border:1px solid var(--b2);border-radius:3px;padding:1px 5px;font-size:9px}
+
+/* BOTTOM */
+.bottom{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.panel{background:var(--s1);border:1px solid var(--b1);border-radius:var(--radius);padding:16px 18px}
+.panel-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:12px}
+.kpi-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--b1)}
+.kpi-row:last-child{border-bottom:none}
+.kpi-cb{width:14px;height:14px;border-radius:3px;border:1px solid var(--b2);background:transparent;appearance:none;cursor:pointer;flex-shrink:0;position:relative;transition:background .15s,border-color .15s}
+.kpi-cb:checked{background:var(--gnb);border-color:var(--gnbr)}
+.kpi-cb:checked::after{content:'';position:absolute;left:3px;top:1px;width:5px;height:8px;border-right:1.5px solid var(--grn);border-bottom:1.5px solid var(--grn);transform:rotate(40deg)}
+.kpi-name{font-size:12px;color:var(--text);flex:1}.kpi-name.done{color:var(--t3);text-decoration:line-through}
+.kpi-target{font-family:var(--mono);font-size:10px;color:var(--t2);flex-shrink:0}
+.kpi-streak{font-family:var(--mono);font-size:9px;padding:2px 5px;border-radius:3px;flex-shrink:0;border:1px solid var(--b2);color:var(--t3)}
+.kpi-streak.alive{background:var(--gnb);border-color:var(--gnbr);color:var(--grn)}
+.role-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.role-side-label{font-family:var(--mono);font-size:9px;letter-spacing:.08em;margin-bottom:6px}
+.role-side.old .role-side-label{color:var(--red)}.role-side.new .role-side-label{color:var(--grn)}
+.role-li{font-size:12px;line-height:2;display:flex;align-items:center;gap:6px}
+.role-pip{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.role-side.old .role-li{color:var(--t2)}.role-side.old .role-pip{background:var(--red);opacity:.4}
+.role-side.new .role-li{color:var(--text)}.role-side.new .role-pip{background:var(--grn)}
+.gym-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.gym-card{background:var(--cb-gym);border:1px solid var(--cbr-gym);border-radius:var(--radius-s);padding:8px 10px;color:var(--c-gym)}
+.gym-card-day{font-family:var(--mono);font-size:9px;opacity:.6;margin-bottom:3px}
+.gym-card-type{font-size:12px;font-weight:500}
+.gym-note{font-size:11px;color:var(--t2);line-height:1.7}
+.rules{display:flex;flex-wrap:wrap;gap:4px}
+.rule{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:3px;background:var(--s2);border:1px solid var(--b2);color:var(--t2)}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{font-size:11px;font-family:var(--mono);letter-spacing:.06em;padding:6px 13px;border-radius:var(--radius-s);border:1px solid var(--b2);color:var(--t2);transition:color .15s,border-color .15s,background .15s}
+.btn:hover{color:var(--text);border-color:var(--b3);background:var(--s2)}
+.btn-hist{border-color:rgba(90,70,200,0.3);color:rgba(184,168,248,0.6)}
+.btn-hist:hover{border-color:var(--cbr-founder);color:var(--c-founder);background:var(--cb-founder)}
+.footer-note{font-family:var(--mono);font-size:9px;color:var(--t3)}
+
+/* NOTE MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--s2);border:1px solid var(--b2);border-radius:var(--radius);padding:22px;width:370px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.modal-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:5px}
+.modal-title{font-size:15px;font-weight:500;margin-bottom:4px;letter-spacing:-.01em}
+.modal-sub{font-size:11px;color:var(--t2);margin-bottom:14px;line-height:1.5}
+.modal textarea{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--radius-s);color:var(--text);font-family:var(--font);font-size:12px;line-height:1.6;padding:9px 11px;resize:vertical;min-height:80px;outline:none;transition:border-color .15s}
+.modal textarea:focus{border-color:var(--b3)}
+.modal-row{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+.modal-btn{font-size:11px;font-family:var(--mono);letter-spacing:.05em;padding:5px 13px;border-radius:var(--radius-s);border:1px solid var(--b2);color:var(--t2);transition:color .15s,border-color .15s}
+.modal-btn:hover{color:var(--text);border-color:var(--b3)}
+.modal-btn.ok{border-color:rgba(90,70,200,.35);color:var(--c-founder)}
+.modal-btn.ok:hover{background:var(--cb-founder)}
+
+/* HISTORY */
+.hist-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:150;align-items:flex-start;justify-content:flex-end;padding:22px}
+.hist-overlay.open{display:flex}
+.hist-panel{background:var(--s2);border:1px solid var(--b2);border-radius:var(--radius);width:460px;max-width:95vw;max-height:calc(100vh - 44px);display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.hist-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.hist-title{font-size:15px;font-weight:500;letter-spacing:-.01em}
+.hist-close{font-size:18px;color:var(--t3);cursor:pointer;transition:color .15s;font-family:var(--mono)}
+.hist-close:hover{color:var(--text)}
+.hist-body{overflow-y:auto;flex:1;padding:14px 20px 20px}
+.hist-empty{font-size:12px;color:var(--t3);font-family:var(--mono);padding:20px 0;text-align:center;line-height:1.8}
+.hw{margin-bottom:14px;border:1px solid var(--b1);border-radius:var(--radius-s);overflow:hidden}
+.hw-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--s3);cursor:pointer;transition:background .12s}
+.hw-hdr:hover{background:var(--s4)}
+.hw-date{font-family:var(--mono);font-size:11px;color:var(--text);letter-spacing:.04em}
+.hw-score{font-family:var(--mono);font-size:10px;color:var(--grn)}
+.hw-arr{font-family:var(--mono);font-size:9px;color:var(--t3);transition:transform .2s}
+.hw.open .hw-arr{transform:rotate(90deg)}
+.hw-body{display:none;padding:11px 13px;background:var(--s1)}
+.hw.open .hw-body{display:block}
+.hw-sec{margin-bottom:12px}.hw-sec:last-child{margin-bottom:0}
+.hw-sl{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin-bottom:7px}
+.hw-energy-row{display:flex;gap:7px;flex-wrap:wrap}
+.hw-eday{display:flex;flex-direction:column;align-items:center;gap:3px}
+.hw-eday-name{font-family:var(--mono);font-size:8px;color:var(--t3)}
+.hw-epip{width:10px;height:10px;border-radius:50%;background:var(--s3);border:1px solid var(--b2)}
+.hw-kpis{display:flex;flex-wrap:wrap;gap:4px}
+.hw-kpi{font-size:10px;font-family:var(--mono);padding:2px 6px;border-radius:3px}
+.hw-kpi.hit{background:var(--gnb);border:1px solid var(--gnbr);color:var(--grn)}
+.hw-kpi.miss{background:var(--s3);border:1px solid var(--b2);color:var(--t3)}
+.hw-note{background:var(--s2);border-radius:3px;padding:6px 8px;margin-bottom:5px}
+.hw-note-where{font-family:var(--mono);font-size:8px;color:var(--t3);margin-bottom:2px}
+.hw-note-text{font-size:11px;color:var(--t2);line-height:1.5;font-style:italic}
+
+/* CTX */
+.ctx{display:none;position:fixed;z-index:200;background:var(--s3);border:1px solid var(--b2);border-radius:var(--radius-s);padding:4px;min-width:148px;box-shadow:0 12px 32px rgba(0,0,0,.6)}
+.ctx.open{display:block}
+.ctx-item{padding:7px 11px;font-size:12px;border-radius:3px;cursor:pointer;color:var(--text);transition:background .1s}
+.ctx-item:hover{background:var(--s4)}
+.ctx-item.del{color:var(--red)}
+
+@media print{
+  body{background:#fff;color:#111;padding:12px}
+  .palette,.energy-strip,.footer,.overlay,.ctx,.hist-overlay{display:none!important}
+  .panel{background:#f8f8f8;border:1px solid #ddd}
+  .pblk{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pblk-x,.pblk-resize{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hdr">
+  <div>
+    <div class="hdr-eyebrow">Founder OS</div>
+    <div class="hdr-title">Weekly <em>Operating System</em></div>
+    <div class="hdr-week" id="week-label"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+</header>
+
+<div class="energy-strip">
+  <div class="energy-label">Energy this week</div>
+  <div class="energy-days" id="energy-days"></div>
+  <div class="energy-hint">
+    <div class="ehint-item"><div class="ehint-pip" style="background:#d44"></div>low</div>
+    <div class="ehint-item"><div class="ehint-pip" style="background:#bb4"></div>ok</div>
+    <div class="ehint-item"><div class="ehint-pip" style="background:#2ba"></div>great</div>
+  </div>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-label">This week</div>
+  <div class="summary-items" id="summary-items"></div>
+</div>
+
+<div class="body-layout">
+  <div class="cal-outer">
+    <div class="cal-wrap" id="cal-wrap"></div>
+  </div>
+  <div class="palette">
+    <div class="pal-label">Block reference</div>
+    <div class="pal-blocks" id="palette"></div>
+    <div class="pal-hints">
+      <div class="pal-hint-row"><span class="pal-hk">drag</span> onto grid</div>
+      <div class="pal-hint-row"><span class="pal-hk">click</span> to add note</div>
+      <div class="pal-hint-row"><span class="pal-hk">drag bottom</span> to resize</div>
+      <div class="pal-hint-row"><span class="pal-hk">▸</span> expand details</div>
+      <div class="pal-hint-row"><span class="pal-hk">right-click</span> to remove</div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom">
+  <div class="panel">
+    <div class="panel-label">Real weekly KPIs</div>
+    <div id="kpi-list"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Role transition</div>
+    <div class="role-cols">
+      <div class="role-side old">
+        <div class="role-side-label">Stop doing</div>
+        <div class="role-li"><div class="role-pip"></div>Manager</div>
+        <div class="role-li"><div class="role-pip"></div>Receptionist</div>
+        <div class="role-li"><div class="role-pip"></div>Firefighter</div>
+        <div class="role-li"><div class="role-pip"></div>Detail-follower</div>
+        <div class="role-li"><div class="role-pip"></div>Strategist-of-everything</div>
+      </div>
+      <div class="role-side new">
+        <div class="role-side-label">Start doing</div>
+        <div class="role-li"><div class="role-pip"></div>System designer</div>
+        <div class="role-li"><div class="role-pip"></div>Capital allocator</div>
+        <div class="role-li"><div class="role-pip"></div>Brand builder</div>
+        <div class="role-li"><div class="role-pip"></div>KPI reviewer</div>
+        <div class="role-li"><div class="role-pip"></div>Escalation decider</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Bodybuilding — minimum viable</div>
+    <div class="gym-cards">
+      <div class="gym-card"><div class="gym-card-day">MON</div><div class="gym-card-type">Push</div></div>
+      <div class="gym-card"><div class="gym-card-day">WED</div><div class="gym-card-type">Pull</div></div>
+      <div class="gym-card"><div class="gym-card-day">FRI</div><div class="gym-card-type">Legs</div></div>
+    </div>
+    <div class="gym-note">Midday 11–14 · 45–60 min · Success metric: did I show up?</div>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Hard rules</div>
+    <div class="rules">
+      <span class="rule">No hotel ops in founder block</span>
+      <span class="rule">No WhatsApp firefighting</span>
+      <span class="rule">EOD review ≤ 30 min</span>
+      <span class="rule">Evening = life not work</span>
+      <span class="rule">Not on dashboard → system gap</span>
+      <span class="rule">Gym = just show up</span>
+      <span class="rule">Sunday = plan not produce</span>
+      <span class="rule">Miss gym → reschedule not skip</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn" onclick="resetAll()">↺  Reset</button>
+  <button class="btn btn-hist" onclick="copyLastWeek()">⎘  Copy last week</button>
+  <button class="btn btn-hist" onclick="openHistory()">◷  History</button>
+  <button class="btn" onclick="window.print()">⎙  Export PDF</button>
+  <span class="footer-note">Auto-saved in your browser</span>
+</div>
+
+</div>
+
+<!-- NOTE MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-eyebrow">Weekly focus note</div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <textarea id="modal-ta"></textarea>
+    <div class="modal-row">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn ok" onclick="saveNote()">Save note</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="hist-overlay" id="hist-overlay" onclick="histOverlayClick(event)">
+  <div class="hist-panel">
+    <div class="hist-hdr">
+      <div class="hist-title">Week history</div>
+      <div class="hist-close" onclick="closeHistory()">✕</div>
+    </div>
+    <div class="hist-body" id="hist-body"></div>
+  </div>
+</div>
+
+<!-- CTX -->
+<div class="ctx" id="ctx">
+  <div class="ctx-item" onclick="ctxNote()">✎  Add / edit note</div>
+  <div class="ctx-item del" onclick="ctxClear()">✕  Remove block</div>
+</div>
+
+<script>
+/* ─── CONSTANTS ─────────────────────────────────────── */
+const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const H_START=6, H_END=24;
+const HOURS=Array.from({length:H_END-H_START},(_,i)=>H_START+i);
+const SLOT=0.5;                       // 30-minute granularity
+const SLOTS_PER_HOUR=2;
+const TOTAL_SLOTS=(H_END-H_START)*SLOTS_PER_HOUR;
+const SLOT_H=26;                      // px per 30-min slot (so 1h = 52px, unchanged visual)
+const ROW_H=SLOT_H*SLOTS_PER_HOUR;    // px per hour = 52
+const todayIdx=(()=>{const d=new Date().getDay();return d===0?6:d-1})();
+const MOOD_COLORS=['','#d44','#d84','#bb4','#4a4','#2ba'];
+
+// format a decimal hour like 8.5 -> "8:30am", 11 -> "11am"
+function fmtHour(h){
+  const whole=Math.floor(h);
+  const min=Math.round((h-whole)*60);
+  const ap=whole<12||whole===24?'am':'pm';
+  const hh=whole%12||12;
+  return min===0?`${hh}${ap}`:`${hh}:${String(min).padStart(2,'0')}${ap}`;
+}
+// format a time range for a block
+function fmtRange(start,span){
+  return `${fmtHour(start)} – ${fmtHour(start+span)}`;
+}
+
+const BLOCKS={
+  founder:{name:'Founder block',cls:'b-founder',pip:'var(--c-founder)',tagline:'Highest-leverage thinking only.',
+    placeholder:'What are you working on this week?\ne.g. Research Airbnb dynamic pricing, build Claude intake workflow',
+    activities:['Investment due diligence','AI workflow design','Brand strategy','Marketing systems','Long-term planning'],
+    rules:['No hotel operations','No WhatsApp firefighting','No receptionist issues','No task following-up']},
+  exec:{name:'Execution block',cls:'b-exec',pip:'var(--c-exec)',tagline:'Build assets and systems. Ship things.',
+    placeholder:'What are you building or shipping?\ne.g. Finish OTA listing copy, publish Claude automation v1',
+    activities:['Claude AI workflow building','Marketing experiments','OTA optimisation','Website updates','Research & writing'],
+    rules:['One focus only — no multitasking','No operational distractions']},
+  recov:{name:'Recovery midday',cls:'b-recov',pip:'var(--c-recov)',tagline:'Protect energy before productivity.',
+    placeholder:'How are you recharging?\ne.g. Lunch at Westlake, 30min walk, finish current book',
+    activities:['Lunch — eat properly, no screen','Walk outside','Reading (not work-related)','Gym Mon / Wed / Fri','Nap if needed'],
+    rules:['No "quick" work tasks','No email triage','No calls']},
+  gym:{name:'Gym',cls:'b-gym',pip:'var(--c-gym)',tagline:'Show up. That is the only metric.',
+    placeholder:'Which session?\ne.g. Push day — chest & shoulders, tried new bench weight',
+    activities:['Monday → Push (chest, shoulders, triceps)','Wednesday → Pull (back, biceps)','Friday → Legs (quads, hamstrings, glutes)','45–60 min max'],
+    rules:['Do not optimise yet — just show up','Missed session → reschedule, never skip']},
+  review:{name:'KPI review',cls:'b-review',pip:'var(--c-review)',tagline:'30 minutes max. You review, not solve.',
+    placeholder:"Any flags from today's dashboard?\ne.g. Occupancy 78%, guest score dipped — manager investigating",
+    activities:['Check occupancy & revenue','Guest satisfaction score','Phone number collection rate','Staff performance flags','Maintenance status'],
+    rules:['Do not solve problems yourself','Ask: what happened / why / correction?','Not on dashboard → system gap to fix']},
+  life:{name:'Life block',cls:'b-life',pip:'var(--c-life)',tagline:'This is not optional. It is the point.',
+    placeholder:"What are you doing tonight?\ne.g. Dinner with Minh, walk around Hoan Kiem, just rest",
+    activities:['Friends & social outings','Dating','Family time','Reading for pleasure','Movies, walks, rest'],
+    rules:['No major work','No "just checking" the hotel','Phone down if possible']},
+  deep:{name:'Deep work',cls:'b-founder',pip:'var(--c-founder)',tagline:'Saturday — 3 to 4 hours max, then stop.',
+    placeholder:"Saturday's focus project?\ne.g. Write investment memo, finish AI brand doc",
+    activities:['Investment research','AI workflow building','Brand strategy & writing','Then stop — enjoy the day'],
+    rules:['Hard stop at 4 hours','No hotel operations','No operational messages']},
+  strategic:{name:'Strategic review',cls:'b-recov',pip:'var(--c-recov)',tagline:'Sunday — plan the week, do not produce.',
+    placeholder:"Key questions for this Sunday?\ne.g. What system is still broken? What is Monday's #1 priority?",
+    activities:['Hotel: what broke / repeated / missing?','Personal: energy, gym, social, learning','Future: what creates most leverage?','Write Monday plan'],
+    rules:['Review only — no execution','No new work started today']},
+};
+
+const KPIS=[
+  {id:'calm',label:'Calm / grounded days',target:'5 / 7'},
+  {id:'gym',label:'Gym sessions completed',target:'3 / 3'},
+  {id:'ops',label:'Daily ops involvement',target:'< 30 min'},
+  {id:'social',label:'Social outings',target:'2 +'},
+  {id:'fwork',label:'Founder-level hours',target:'10 – 15 h'},
+  {id:'rest',label:'Full recovery day',target:'1'},
+];
+
+/* Default schedule */
+const DEFAULT_PLACED=[
+  ...[0,1,2,3,4].flatMap(d=>[
+    {day:d,startHour:8,spanHours:3,type:'founder'},
+    {day:d,startHour:11,spanHours:3,type:'recov'},
+    {day:d,startHour:14,spanHours:3,type:'exec'},
+    {day:d,startHour:17,spanHours:0.5,type:'review'},
+    {day:d,startHour:18,spanHours:3,type:'life'},
+  ]),
+  {day:5,startHour:8,spanHours:4,type:'deep'},
+  {day:5,startHour:14,spanHours:4,type:'life'},
+  {day:6,startHour:9,spanHours:3,type:'strategic'},
+  {day:6,startHour:18,spanHours:3,type:'life'},
+];
+
+/* ─── WEEK HELPERS ──────────────────────────────────── */
+function weekStart(d=new Date()){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.toISOString().slice(0,10)}
+function weekLabel(wk){const s=new Date(wk+'T00:00:00');const e=new Date(s);e.setDate(s.getDate()+6);const f=x=>x.toLocaleDateString('en-GB',{day:'numeric',month:'short'});return`${f(s)} – ${f(e)}`}
+const THIS_WEEK=weekStart();
+document.getElementById('week-label').textContent=weekLabel(THIS_WEEK);
+
+/* ─── STORAGE ───────────────────────────────────────── */
+const K={pl:'fos7_pl',nt:'fos7_nt',kp:'fos7_kp',kw:'fos7_kw',st:'fos7_st',mo:'fos7_mo',mw:'fos7_mw',hi:'fos7_hi'};
+const lget=(k,fb)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb}catch{return fb}};
+const lset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+
+function hydrate(arr){return arr.map(p=>({...p,id:p.id||uid()}))}
+
+let placed=hydrate(lget(K.pl,JSON.parse(JSON.stringify(DEFAULT_PLACED))));
+let notes=lget(K.nt,{});
+let streaks=lget(K.st,{});
+let history=lget(K.hi,[]);
+
+const savedKW=lget(K.kw,null);
+let kpis=savedKW===THIS_WEEK?lget(K.kp,{}):{};
+if(savedKW!==THIS_WEEK){
+  if(savedKW){
+    const pk=lget(K.kp,{}),pm=lget(K.mo,{}),pn=lget(K.nt,{});
+    KPIS.forEach(k=>{streaks[k.id]=pk[k.id]?(streaks[k.id]||0)+1:0});
+    lset(K.st,streaks);
+    history=history.filter(h=>h.week!==savedKW);
+    history.unshift({week:savedKW,notes:pn,kpis:pk,mood:pm,placed:JSON.parse(JSON.stringify(placed))});
+    if(history.length>52) history=history.slice(0,52);
+    lset(K.hi,history);
+  }
+  lset(K.kw,THIS_WEEK);lset(K.kp,{});
+}
+const savedMW=lget(K.mw,null);
+let mood=savedMW===THIS_WEEK?lget(K.mo,{}):{};
+if(savedMW!==THIS_WEEK){lset(K.mw,THIS_WEEK);lset(K.mo,{})}
+
+function savePlaced(){lset(K.pl,placed)}
+function saveNotes(){lset(K.nt,notes)}
+
+/* ─── OVERLAP DETECTION ─────────────────────────────── */
+/**
+ * Check whether placing a block with (day, startHour, spanHours) would
+ * overlap any existing block, optionally excluding one block by id.
+ */
+function hasOverlap(day, startHour, spanHours, excludeId=null){
+  const newEnd=startHour+spanHours;
+  return placed.some(p=>{
+    if(p.id===excludeId) return false;
+    if(p.day!==day) return false;
+    const pEnd=p.startHour+p.spanHours;
+    // overlap if intervals intersect
+    return startHour<pEnd && newEnd>p.startHour;
+  });
+}
+
+/**
+ * Given a day + startHour, find the maximum span that fits without overlapping,
+ * up to a requested span, optionally excluding one block id. Snaps to 0.5h.
+ */
+function maxFitSpan(day, startHour, requestedSpan, excludeId=null){
+  let maxSpan=Math.min(requestedSpan, H_END-startHour);
+  const blockers=placed.filter(p=>p.id!==excludeId && p.day===day && p.startHour>=startHour);
+  if(blockers.length){
+    const nearest=Math.min(...blockers.map(p=>p.startHour));
+    maxSpan=Math.min(maxSpan, nearest-startHour);
+  }
+  // snap down to nearest half hour
+  maxSpan=Math.floor(maxSpan/SLOT)*SLOT;
+  return Math.max(0,maxSpan);
+}
+
+/* ─── STATE ─────────────────────────────────────────── */
+let drag=null;
+let moving=null;
+let ghost=null;
+let moveHighlight=null;
+let resizing=null;
+let ctxTarget=null;
+let modalTarget=null;
+
+/* ─── LEGEND ────────────────────────────────────────── */
+const LEG=[{l:'Founder',p:'var(--c-founder)'},{l:'Recovery',p:'var(--c-recov)'},{l:'Execution',p:'var(--c-exec)'},{l:'KPI review',p:'var(--c-review)'},{l:'Life',p:'var(--c-life)'},{l:'Gym',p:'var(--c-gym)'}];
+document.getElementById('legend').innerHTML=LEG.map(x=>`<div class="leg"><div class="leg-pip" style="background:${x.p}"></div>${x.l}</div>`).join('');
+
+/* ─── ENERGY ────────────────────────────────────────── */
+function buildEnergy(){
+  const c=document.getElementById('energy-days');c.innerHTML='';
+  DAYS.forEach((d,i)=>{
+    const cur=mood[i]||0;
+    const w=document.createElement('div');w.className='eday';
+    w.innerHTML=`<div class="eday-name">${d.slice(0,2)}</div><div class="epips"></div>`;
+    const pp=w.querySelector('.epips');
+    for(let v=1;v<=5;v++){
+      const dot=document.createElement('div');dot.className='epip'+(cur===v?` e${v}`:'');
+      dot.title=['','Low','Tired','Okay','Good','Great'][v];
+      dot.onclick=()=>{mood[i]=mood[i]===v?0:v;lset(K.mo,mood);buildEnergy()};
+      pp.appendChild(dot);
+    }
+    c.appendChild(w);
+  });
+}
+
+/* ─── BUILD CALENDAR ────────────────────────────────── */
+const escRaw=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc=s=>escRaw(s).replace(/\n/g,'<br>');
+
+// Column elements by day index — store references for block rendering
+const dayColEls=[];
+
+function buildCal(){
+  const wrap=document.getElementById('cal-wrap');
+  wrap.innerHTML='';
+  dayColEls.length=0;
+
+  // ── Corner
+  const corner=document.createElement('div');corner.className='cal-corner';wrap.appendChild(corner);
+
+  // ── Day headers
+  DAYS.forEach((d,i)=>{
+    const ch=document.createElement('div');
+    ch.className='cal-ch'+(i===todayIdx?' now':'');
+    ch.textContent=d+(i===todayIdx?' ·':'');
+    wrap.appendChild(ch);
+  });
+
+  // ── Time column (one label per hour, height = 2 slots)
+  const timeCol=document.createElement('div');timeCol.className='cal-time-col';
+  HOURS.forEach(h=>{
+    const tc=document.createElement('div');tc.className='cal-time-cell';tc.textContent=fmtHour(h);
+    timeCol.appendChild(tc);
+  });
+  wrap.appendChild(timeCol);
+
+  // ── Day columns — half-hour cells
+  DAYS.forEach((_,di)=>{
+    const col=document.createElement('div');col.className='cal-day-col';
+    for(let s=0;s<TOTAL_SLOTS;s++){
+      const hour=H_START+s*SLOT;
+      const cell=document.createElement('div');
+      cell.className='cal-half-cell'+(s%2===0?' top-of-hour':'');
+      cell.dataset.day=di;cell.dataset.hour=hour;
+      setupCellDrop(cell);
+      col.appendChild(cell);
+    }
+    wrap.appendChild(col);
+    dayColEls.push(col);
+  });
+
+  drawNowLine();
+  renderBlocks();
+}
+
+/* ─── NOW LINE ──────────────────────────────────────── */
+let nowLineTimer=null;
+function drawNowLine(){
+  // remove existing
+  document.querySelectorAll('.now-line').forEach(el=>el.remove());
+  const now=new Date();
+  const h=now.getHours()+now.getMinutes()/60;
+  if(h<H_START||h>H_END) return;
+  const col=dayColEls[todayIdx];
+  if(!col) return;
+  const top=(h-H_START)*ROW_H;
+  const line=document.createElement('div');
+  line.className='now-line';
+  line.style.top=top+'px';
+  line.innerHTML='<div class="now-dot"></div>';
+  col.appendChild(line);
+}
+// refresh now-line every minute
+if(nowLineTimer) clearInterval(nowLineTimer);
+nowLineTimer=setInterval(drawNowLine,60000);
+
+/* ─── RENDER BLOCKS ─────────────────────────────────── */
+function renderBlocks(){
+  document.querySelectorAll('.pblk').forEach(el=>el.remove());
+  placed.forEach(p=>{
+    const b=BLOCKS[p.type]||BLOCKS.founder;
+    const note=notes[p.id]||'';
+    const isShort=p.spanHours<=1;     // hide note zone if 1h or less
+    const isTiny=p.spanHours<=0.5;    // 30-min: ultra compact
+    const top=(p.startHour-H_START)*ROW_H+2;
+    const height=p.spanHours*ROW_H-4;
+
+    const blk=document.createElement('div');
+    blk.className=`pblk ${b.cls}${isShort?' short':''}${isTiny?' tiny':''}`;
+    blk.dataset.id=p.id;
+    blk.style.top=top+'px';
+    blk.style.height=height+'px';
+    blk.innerHTML=`
+      <div class="pblk-top">
+        <div class="pblk-pip" style="background:${b.pip}"></div>
+        <div class="pblk-name">${b.name}</div>
+        <div class="pblk-x" title="Remove">✕</div>
+      </div>
+      <div class="pblk-time">${fmtRange(p.startHour,p.spanHours)}</div>
+      ${!isShort?`<div class="pblk-note-zone">${note?`<div class="pblk-note-txt">${esc(note)}</div>`:`<div class="pblk-note-ph">add focus…</div>`}</div>`:''}
+      <div class="pblk-resize"></div>
+    `;
+
+    blk.querySelector('.pblk-x').addEventListener('mousedown',e=>e.stopPropagation());
+    blk.querySelector('.pblk-x').addEventListener('click',e=>{e.stopPropagation();removeBlock(p.id)});
+    blk.addEventListener('contextmenu',e=>{e.preventDefault();openCtx(e,p.id)});
+
+    // ── MOVE (mouse + touch) — anywhere except resize handle / X
+    const moveStart=e=>{
+      if(e.type==='mousedown'&&e.button!==0) return;
+      const tgt=e.target;
+      if(tgt.classList.contains('pblk-resize')) return;
+      if(tgt.classList.contains('pblk-x')) return;
+      e.preventDefault();
+      startBlockMove(e,p.id);
+    };
+    blk.addEventListener('mousedown',moveStart);
+    blk.addEventListener('touchstart',moveStart,{passive:false});
+
+    // ── RESIZE (mouse + touch)
+    const rh=blk.querySelector('.pblk-resize');
+    const resizeStart=e=>{
+      if(e.type==='mousedown'&&e.button!==0) return;
+      e.preventDefault();e.stopPropagation();
+      startBlockResize(e,p.id);
+    };
+    rh.addEventListener('mousedown',resizeStart);
+    rh.addEventListener('touchstart',resizeStart,{passive:false});
+
+    dayColEls[p.day].appendChild(blk);
+  });
+}
+
+/* helper: get clientX/clientY from mouse OR touch event */
+function pointer(e){
+  if(e.touches&&e.touches.length) return{x:e.touches[0].clientX,y:e.touches[0].clientY};
+  if(e.changedTouches&&e.changedTouches.length) return{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
+  return{x:e.clientX,y:e.clientY};
+}
+
+/* ─── GHOST ELEMENT for move preview ────────────────── */
+function createGhost(type,spanHours){
+  if(ghost) ghost.remove();
+  const b=BLOCKS[type]||BLOCKS.founder;
+  ghost=document.createElement('div');
+  ghost.className=`pblk ${b.cls}`;
+  ghost.style.position='fixed';
+  ghost.style.pointerEvents='none';
+  ghost.style.opacity='0.55';
+  ghost.style.width='120px';
+  ghost.style.height=(spanHours*ROW_H-4)+'px';
+  ghost.style.zIndex='9999';
+  ghost.style.left='-200px';
+  ghost.innerHTML=`<div class="pblk-top"><div class="pblk-pip" style="background:${b.pip}"></div><div class="pblk-name">${b.name}</div></div>`;
+  document.body.appendChild(ghost);
+}
+
+/* ─── BLOCK MOVE (mouse + touch) ─────────────────────── */
+function startBlockMove(e,id){
+  const p=placed.find(x=>x.id===id);if(!p) return;
+  const start=pointer(e);
+  const startX=start.x,startY=start.y;
+  let didMove=false;
+  const isTouch=e.type==='touchstart';
+
+  function cleanup(){
+    document.removeEventListener('mousemove',mmHandler);
+    document.removeEventListener('mouseup',muHandler);
+    document.removeEventListener('touchmove',mmHandler);
+    document.removeEventListener('touchend',muHandler);
+    clearMoveHighlight();
+    if(ghost){ghost.remove();ghost=null;}
+    const blk=document.querySelector(`.pblk[data-id="${id}"]`);
+    if(blk) blk.style.opacity='';
+  }
+
+  function mmHandler(me){
+    if(me.type==='touchmove') me.preventDefault();
+    const pt=pointer(me);
+    const dx=pt.x-startX,dy=pt.y-startY;
+    if(!didMove){
+      if(Math.sqrt(dx*dx+dy*dy)<8) return;
+      didMove=true;
+      moving={id,spanHours:p.spanHours,type:p.type};
+      createGhost(p.type,p.spanHours);
+      const blk=document.querySelector(`.pblk[data-id="${id}"]`);
+      if(blk) blk.style.opacity='0.2';
+    }
+    if(!ghost) return;
+    ghost.style.left=(pt.x+14)+'px';
+    ghost.style.top=(pt.y-16)+'px';
+    clearMoveHighlight();
+    const target=getCalCellByCoords(pt.x,pt.y);
+    if(!target) return;
+    const fit=maxFitSpan(target.day,target.hour,moving.spanHours,moving.id);
+    if(fit>=SLOT) highlightHours(target.day,target.hour,Math.min(moving.spanHours,fit));
+  }
+
+  function muHandler(me){
+    const pt=pointer(me);
+    if(!didMove){
+      cleanup();moving=null;
+      openModal(p.id,p.type,p.day);
+      return;
+    }
+    const target=getCalCellByCoords(pt.x,pt.y);
+    cleanup();
+    if(target){
+      const fit=maxFitSpan(target.day,target.hour,moving.spanHours,moving.id);
+      if(fit>=SLOT){
+        const pp=placed.find(x=>x.id===moving.id);
+        if(pp){pp.day=target.day;pp.startHour=target.hour;pp.spanHours=Math.min(pp.spanHours,fit);}
+        savePlaced();
+      }
+    }
+    moving=null;
+    renderBlocks();
+    updateSummary();
+  }
+
+  if(isTouch){
+    document.addEventListener('touchmove',mmHandler,{passive:false});
+    document.addEventListener('touchend',muHandler);
+  } else {
+    document.addEventListener('mousemove',mmHandler);
+    document.addEventListener('mouseup',muHandler);
+  }
+}
+
+/* ─── COORDINATE-BASED CELL HIT TEST (half-hour) ─────── */
+function getCalCellByCoords(clientX,clientY){
+  for(let di=0;di<dayColEls.length;di++){
+    const col=dayColEls[di];
+    const rect=col.getBoundingClientRect();
+    if(clientX<rect.left||clientX>rect.right) continue;
+    const relY=clientY-rect.top;
+    const slotIdx=Math.floor(relY/SLOT_H);
+    if(slotIdx<0||slotIdx>=TOTAL_SLOTS) continue;
+    return{day:di,hour:H_START+slotIdx*SLOT};
+  }
+  return null;
+}
+
+/* ─── BLOCK RESIZE (mouse + touch, half-hour) ────────── */
+function startBlockResize(e,id){
+  const p=placed.find(x=>x.id===id);if(!p) return;
+  const start=pointer(e);
+  resizing={id,startY:start.y,origSpan:p.spanHours,day:p.day,startHour:p.startHour};
+  const isTouch=e.type==='touchstart';
+  if(isTouch){
+    document.addEventListener('touchmove',onResizeMove,{passive:false});
+    document.addEventListener('touchend',onResizeUp);
+  } else {
+    document.addEventListener('mousemove',onResizeMove);
+    document.addEventListener('mouseup',onResizeUp);
+  }
+}
+
+function onResizeMove(e){
+  if(!resizing) return;
+  if(e.type==='touchmove') e.preventDefault();
+  const pt=pointer(e);
+  // snap delta to half-hour slots
+  const deltaSlots=Math.round((pt.y-resizing.startY)/SLOT_H);
+  const desired=Math.max(SLOT,resizing.origSpan+deltaSlots*SLOT);
+  const allowed=maxFitSpan(resizing.day,resizing.startHour,desired,resizing.id);
+  if(allowed<SLOT) return;
+  const p=placed.find(x=>x.id===resizing.id);if(!p) return;
+  p.spanHours=allowed;
+  const blk=document.querySelector(`.pblk[data-id="${resizing.id}"]`);
+  if(blk){
+    blk.style.height=(p.spanHours*ROW_H-4)+'px';
+    blk.classList.toggle('short',p.spanHours<=1);
+    blk.classList.toggle('tiny',p.spanHours<=0.5);
+    const tl=blk.querySelector('.pblk-time');
+    if(tl) tl.textContent=fmtRange(p.startHour,p.spanHours);
+    let nz=blk.querySelector('.pblk-note-zone');
+    if(p.spanHours>1&&!nz){
+      nz=document.createElement('div');nz.className='pblk-note-zone';
+      const note=notes[p.id]||'';
+      nz.innerHTML=note?`<div class="pblk-note-txt">${esc(note)}</div>`:`<div class="pblk-note-ph">add focus…</div>`;
+      blk.querySelector('.pblk-resize').before(nz);
+    } else if(p.spanHours<=1&&nz) nz.remove();
+  }
+}
+
+function onResizeUp(){
+  if(!resizing) return;
+  savePlaced();
+  document.removeEventListener('mousemove',onResizeMove);
+  document.removeEventListener('mouseup',onResizeUp);
+  document.removeEventListener('touchmove',onResizeMove);
+  document.removeEventListener('touchend',onResizeUp);
+  resizing=null;
+  updateSummary();
+}
+
+/* ─── HIGHLIGHT HELPERS (half-hour cells) ────────────── */
+function highlightHours(day,startHour,spanHours){
+  for(let h=startHour;h<startHour+spanHours&&h<H_END;h+=SLOT){
+    const cell=document.querySelector(`.cal-half-cell[data-day="${day}"][data-hour="${h}"]`);
+    if(cell){cell.classList.add('drop-active');if(!moveHighlight) moveHighlight=[];moveHighlight.push(cell);}
+  }
+}
+function clearMoveHighlight(){
+  if(moveHighlight){moveHighlight.forEach(c=>c.classList.remove('drop-active'));moveHighlight=null;}
+  document.querySelectorAll('.cal-half-cell.drop-active').forEach(c=>c.classList.remove('drop-active'));
+}
+
+/* ─── CELL DROP (palette drops) ─────────────────────── */
+function defaultSpan(type){
+  return{founder:3,deep:3,recov:3,strategic:3,exec:3,life:3,gym:1.5,review:0.5}[type]||2;
+}
+
+function setupCellDrop(cell){
+  cell.addEventListener('dragover',e=>{
+    if(!drag||drag.kind!=='palette') return;
+    e.preventDefault();
+    const day=+cell.dataset.day,hour=+cell.dataset.hour;
+    const fits=maxFitSpan(day,hour,defaultSpan(drag.type),null)>=SLOT;
+    cell.classList.toggle('drop-active',fits);
+    e.dataTransfer.dropEffect=fits?'copy':'none';
+  });
+  cell.addEventListener('dragleave',()=>cell.classList.remove('drop-active'));
+  cell.addEventListener('drop',e=>{
+    e.preventDefault();
+    cell.classList.remove('drop-active');
+    if(!drag||drag.kind!=='palette') return;
+    const day=+cell.dataset.day,hour=+cell.dataset.hour;
+    const fit=maxFitSpan(day,hour,defaultSpan(drag.type),null);
+    if(fit<SLOT){flashConflict(day);drag=null;return}
+    placed.push({id:uid(),day,startHour:hour,spanHours:fit,type:drag.type});
+    savePlaced();renderBlocks();updateSummary();drag=null;
+  });
+}
+
+/* Flash a red outline on the day column to signal conflict */
+function flashConflict(day){
+  const col=dayColEls[day];
+  if(!col) return;
+  col.style.outline='2px solid var(--red)';
+  col.style.transition='outline .3s';
+  setTimeout(()=>{col.style.outline='none'},400);
+}
+
+/* ─── REMOVE ────────────────────────────────────────── */
+function removeBlock(id){
+  placed=placed.filter(x=>x.id!==id);
+  delete notes[id];
+  savePlaced();saveNotes();renderBlocks();
+}
+
+/* ─── PALETTE ───────────────────────────────────────── */
+function buildPalette(){
+  const p=document.getElementById('palette');p.innerHTML='';
+  Object.entries(BLOCKS).forEach(([key,b])=>{
+    const el=document.createElement('div');el.className=`pal-blk ${b.cls}`;el.draggable=true;el.dataset.type=key;
+    const acts=b.activities.map(a=>`<div class="pal-act">${esc(a)}</div>`).join('');
+    const rules=b.rules.map(r=>`<div class="pal-rul">${esc(r)}</div>`).join('');
+    el.innerHTML=`
+      <div class="pal-top">
+        <div class="pal-pip" style="background:${b.pip}"></div>
+        <div class="pal-name">${b.name}</div>
+        <div class="pal-arrow">▸</div>
+      </div>
+      <div class="pal-detail"><div class="pal-detail-inner">
+        <div><div class="pal-sl">purpose</div><div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.5;font-style:italic">${esc(b.tagline)}</div></div>
+        <div><div class="pal-sl">do in this block</div>${acts}</div>
+        <div><div class="pal-sl">never do</div>${rules}</div>
+        <div class="pal-dh">↑ drag onto the grid</div>
+      </div></div>`;
+    el.querySelector('.pal-top').addEventListener('click',()=>{if(drag) return;el.classList.toggle('open')});
+    el.addEventListener('dragstart',e=>{
+      drag={kind:'palette',type:key,spanHours:defaultSpan(key)};
+      setTimeout(()=>el.classList.add('dragging'),0);
+      e.dataTransfer.effectAllowed='copy';
+    });
+    el.addEventListener('dragend',()=>{el.classList.remove('dragging');drag=null});
+    p.appendChild(el);
+  });
+}
+
+/* ─── KPIs ──────────────────────────────────────────── */
+function buildKpis(){
+  const list=document.getElementById('kpi-list');list.innerHTML='';
+  KPIS.forEach(k=>{
+    const chk=!!kpis[k.id],str=streaks[k.id]||0;
+    const row=document.createElement('div');row.className='kpi-row';
+    row.innerHTML=`<input type="checkbox" class="kpi-cb" id="kc-${k.id}" ${chk?'checked':''}><label class="kpi-name${chk?' done':''}" for="kc-${k.id}">${k.label}</label><span class="kpi-target">${k.target}</span><span class="kpi-streak${str>0?' alive':''}">${str}w</span>`;
+    row.querySelector('.kpi-cb').addEventListener('change',e=>{kpis[k.id]=e.target.checked;lset(K.kp,kpis);buildKpis()});
+    list.appendChild(row);
+  });
+}
+
+/* ─── CTX MENU ──────────────────────────────────────── */
+function openCtx(e,id){ctxTarget={id};const m=document.getElementById('ctx');m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';m.classList.add('open')}
+function closeCtx(){document.getElementById('ctx').classList.remove('open');ctxTarget=null}
+function ctxNote(){closeCtx();if(ctxTarget){const p=placed.find(x=>x.id===ctxTarget.id);if(p) openModal(p.id,p.type,p.day)}}
+function ctxClear(){closeCtx();if(ctxTarget) removeBlock(ctxTarget.id)}
+document.addEventListener('click',e=>{if(!document.getElementById('ctx').contains(e.target)) closeCtx()});
+
+/* ─── NOTE MODAL ────────────────────────────────────── */
+function openModal(id,type,day){
+  modalTarget={id};
+  const b=BLOCKS[type]||BLOCKS.founder;
+  document.getElementById('modal-title').textContent=`${b.name} — ${DAYS[day]}`;
+  document.getElementById('modal-sub').textContent=b.tagline;
+  const ta=document.getElementById('modal-ta');
+  ta.value=notes[id]||'';ta.placeholder=b.placeholder;
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>ta.focus(),50);
+}
+function saveNote(){
+  if(!modalTarget) return;
+  const v=document.getElementById('modal-ta').value.trim();
+  if(v) notes[modalTarget.id]=v; else delete notes[modalTarget.id];
+  saveNotes();closeModal();renderBlocks();
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open');modalTarget=null}
+function overlayClick(e){if(e.target===document.getElementById('overlay')) closeModal()}
+
+/* ─── HISTORY ───────────────────────────────────────── */
+function openHistory(){buildHistoryPanel();document.getElementById('hist-overlay').classList.add('open')}
+function closeHistory(){document.getElementById('hist-overlay').classList.remove('open')}
+function histOverlayClick(e){if(e.target===document.getElementById('hist-overlay')) closeHistory()}
+
+function buildHistoryPanel(){
+  const body=document.getElementById('hist-body');body.innerHTML='';
+  if(!history.length){
+    body.innerHTML=`<div class="hist-empty">No past weeks yet.<br>History saves automatically every Monday.</div>`;
+    return;
+  }
+  history.forEach(entry=>{
+    const hw=document.createElement('div');hw.className='hw';
+    const hits=KPIS.filter(k=>entry.kpis&&entry.kpis[k.id]).length;
+    hw.innerHTML=`<div class="hw-hdr"><div class="hw-date">${weekLabel(entry.week)}</div><div style="display:flex;gap:10px;align-items:center"><span class="hw-score">${hits}/${KPIS.length} KPIs</span><span class="hw-arr">▸</span></div></div><div class="hw-body"></div>`;
+    hw.querySelector('.hw-hdr').addEventListener('click',()=>hw.classList.toggle('open'));
+    const hwb=hw.querySelector('.hw-body');
+    const moodHtml=DAYS.map((d,i)=>{const v=entry.mood&&entry.mood[i]||0;const col=v?MOOD_COLORS[v]:'var(--s3)';return`<div class="hw-eday"><div class="hw-eday-name">${d.slice(0,2)}</div><div class="hw-epip" style="background:${col};border-color:${v?col:'var(--b2)'}"></div></div>`}).join('');
+    const kpiHtml=KPIS.map(k=>`<span class="hw-kpi ${entry.kpis&&entry.kpis[k.id]?'hit':'miss'}">${k.label}</span>`).join('');
+    // Notes — use block name from placed snapshot if available
+    let notesHtml='';
+    if(entry.notes && Object.keys(entry.notes).length){
+      notesHtml=Object.entries(entry.notes).filter(([,t])=>t).map(([id,text])=>{
+        // try to find the block type from the placed snapshot
+        const snap=entry.placed&&entry.placed.find(x=>x.id===id);
+        const bname=snap&&BLOCKS[snap.type]?BLOCKS[snap.type].name:'Block';
+        const dayName=snap?DAYS[snap.day]:'';
+        return`<div class="hw-note"><div class="hw-note-where">${esc(bname)}${dayName?' — '+dayName:''}</div><div class="hw-note-text">${esc(text)}</div></div>`;
+      }).join('');
+    }
+    hwb.innerHTML=`
+      <div class="hw-sec"><div class="hw-sl">Energy</div><div class="hw-energy-row">${moodHtml}</div></div>
+      <div class="hw-sec"><div class="hw-sl">KPIs</div><div class="hw-kpis">${kpiHtml}</div></div>
+      ${notesHtml?`<div class="hw-sec"><div class="hw-sl">Focus notes</div>${notesHtml}</div>`:''}
+    `;
+    body.appendChild(hw);
+  });
+}
+
+/* ─── RESET ─────────────────────────────────────────── */
+function resetAll(){
+  if(!confirm('Reset schedule to default? Notes will be cleared.')) return;
+  placed=hydrate(JSON.parse(JSON.stringify(DEFAULT_PLACED)));
+  notes={};savePlaced();saveNotes();renderBlocks();updateSummary();
+}
+
+/* ─── COPY LAST WEEK ────────────────────────────────── */
+function copyLastWeek(){
+  if(!history.length){alert('No previous week saved yet. History fills in automatically as weeks pass.');return}
+  const last=history[0]; // most recent archived week
+  if(!last.placed||!last.placed.length){alert('Last week has no saved layout.');return}
+  if(placed.length && !confirm('Replace this week\'s layout with last week\'s? Current blocks and notes will be overwritten.')) return;
+
+  // remap ids so notes stay attached
+  const idMap={};
+  placed=last.placed.map(p=>{
+    const newId=uid();
+    idMap[p.id]=newId;
+    return{...p,id:newId};
+  });
+  // bring forward notes too
+  notes={};
+  if(last.notes){
+    Object.entries(last.notes).forEach(([oldId,text])=>{
+      if(idMap[oldId]) notes[idMap[oldId]]=text;
+    });
+  }
+  savePlaced();saveNotes();renderBlocks();updateSummary();
+}
+
+/* ─── WEEKLY SUMMARY ────────────────────────────────── */
+function updateSummary(){
+  const el=document.getElementById('summary-items');
+  if(!el) return;
+  // sum hours by category — group deep into founder, strategic into recovery
+  const groups={
+    Founder:{hours:0,pip:'var(--c-founder)',types:['founder','deep']},
+    Execution:{hours:0,pip:'var(--c-exec)',types:['exec']},
+    Recovery:{hours:0,pip:'var(--c-recov)',types:['recov','strategic']},
+    Life:{hours:0,pip:'var(--c-life)',types:['life']},
+    Gym:{hours:0,pip:'var(--c-gym)',types:['gym'],count:0},
+    Review:{hours:0,pip:'var(--c-review)',types:['review']},
+  };
+  placed.forEach(p=>{
+    for(const g of Object.values(groups)){
+      if(g.types.includes(p.type)){g.hours+=p.spanHours;if(g.count!==undefined)g.count++;break;}
+    }
+  });
+  const fmtH=h=>Number.isInteger(h)?`${h}h`:`${h}h`;
+  el.innerHTML=Object.entries(groups).map(([name,g])=>{
+    const val=name==='Gym'?`${g.count}×`:fmtH(g.hours);
+    return`<div class="sum-item"><div class="sum-pip" style="background:${g.pip}"></div>${name} <span class="sum-val">${val}</span></div>`;
+  }).join('');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCtx();closeModal();closeHistory()}});
+
+/* ─── INIT ──────────────────────────────────────────── */
+buildEnergy();buildCal();buildPalette();buildKpis();updateSummary();
+</script>
+</body>
+</html>
